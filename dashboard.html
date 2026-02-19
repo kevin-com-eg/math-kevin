@@ -1,29 +1,685 @@
-import { useEffect, useState } from "react";
-import { db } from "./firebase-config"; // ملف إعدادات فايربيز بتاعك
-import { collection, getDocs } from "firebase/firestore";
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathMaster - لوحة التحكم</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      font-family: 'Tajawal', sans-serif;
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Light mode variables */
+    :root {
+      --bg-primary: #f0f4fa;
+      --bg-secondary: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+      --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+      --hover-bg: #f3f4f6;
+    }
+    
+    /* Dark mode variables */
+    .dark {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border-color: #334155;
+      --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      --hover-bg: #334155;
+    }
+    
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+    }
+    
+    .bg-secondary {
+      background-color: var(--bg-secondary) !important;
+    }
+    
+    .text-secondary {
+      color: var(--text-secondary) !important;
+    }
+    
+    .border-custom {
+      border-color: var(--border-color) !important;
+    }
+    
+    .card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+    }
+    
+    .hover-card:hover {
+      background-color: var(--hover-bg);
+    }
+    
+    /* Gradient cards (stay the same in both modes) */
+    .gradient-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .gradient-card-green {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .gradient-card-orange {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    .gradient-card-red {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+    
+    /* Animations */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-slide {
+      animation: slideIn 0.5s ease forwards;
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    
+    /* Toggle switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    .slider i {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      transition: .4s;
+      z-index: 1;
+    }
+    
+    .slider .fa-sun {
+      left: 8px;
+      color: #fbbf24;
+      opacity: 1;
+    }
+    
+    .slider .fa-moon {
+      right: 8px;
+      color: #f1f5f9;
+      opacity: 0;
+    }
+    
+    input:checked + .slider .fa-sun {
+      opacity: 0;
+    }
+    
+    input:checked + .slider .fa-moon {
+      opacity: 1;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 4px;
+    }
+    
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--border-color) 25%, var(--hover-bg) 50%, var(--border-color) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body class="min-h-screen">
 
-function Dashboard() {
-  const [stats, setStats] = useState({ students: 0, lessons: 0 });
+  <!-- Toggle button for mobile -->
+  <button id="mobileMenuBtn" class="fixed bottom-6 left-6 z-50 gradient-card text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center md:hidden">
+    <i class="fa-regular fa-bars text-2xl"></i>
+  </button>
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const studentsCol = await getDocs(collection(db, "students"));
-      const lessonsCol = await getDocs(collection(db, "lessons"));
-      setStats({
-        students: studentsCol.size,
-        lessons: lessonsCol.size
-      });
-    };
-    fetchData();
-  }, []);
-
-  return (
-    <div className="dashboard-container">
-      <h1>مرحباً بك في لوحة التحكم</h1>
-      <div className="cards">
-        <div className="card">عدد الطلاب: {stats.students}</div>
-        <div className="card">عدد الدروس: {stats.lessons}</div>
+  <div class="flex h-screen">
+    
+    <!-- ===== Sidebar ===== -->
+    <aside id="sidebar" class="fixed md:static w-72 h-full bg-secondary border-l border-custom p-6 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40 overflow-y-auto">
+      
+      <!-- Logo -->
+      <div class="flex items-center gap-3 mb-10">
+        <div class="gradient-card p-3 rounded-xl">
+          <i class="fa-solid fa-calculator text-white text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-black" style="color: var(--text-primary);">MathMaster</h2>
+          <p class="text-xs text-secondary">منصة الماث التعليمية</p>
+        </div>
       </div>
-    </div>
-  );
-}
+      
+      <!-- User info -->
+      <div class="card rounded-xl p-4 mb-8 flex items-center gap-3">
+        <div class="gradient-card w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl">
+          أ
+        </div>
+        <div>
+          <p class="font-bold" style="color: var(--text-primary);" id="userName">أحمد محمد</p>
+          <p class="text-xs text-secondary">طالب - ٣ ثانوي</p>
+        </div>
+        <div class="mr-auto">
+          <span class="bg-green-500 w-3 h-3 rounded-full inline-block animate-pulse"></span>
+        </div>
+      </div>
+      
+      <!-- Dark mode toggle in sidebar -->
+      <div class="card rounded-xl p-4 mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-regular fa-moon text-secondary"></i>
+          <span class="text-sm font-bold" style="color: var(--text-primary);">الوضع الليلي</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="slider">
+            <i class="fa-regular fa-sun"></i>
+            <i class="fa-regular fa-moon"></i>
+          </span>
+        </label>
+      </div>
+      
+      <!-- Navigation -->
+      <nav class="space-y-2">
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl gradient-card text-white">
+          <i class="fa-solid fa-chart-pie w-6"></i>
+          <span>الرئيسية</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover-card" style="color: var(--text-primary);">
+          <i class="fa-solid fa-book-open w-6 text-secondary"></i>
+          <span>الدروس</span>
+          <span class="gradient-card text-white text-xs px-2 py-1 rounded-full mr-auto">١٢</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover-card" style="color: var(--text-primary);">
+          <i class="fa-solid fa-pen-to-square w-6 text-secondary"></i>
+          <span>الامتحانات</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover-card" style="color: var(--text-primary);">
+          <i class="fa-solid fa-chart-simple w-6 text-secondary"></i>
+          <span>التقدم</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover-card" style="color: var(--text-primary);">
+          <i class="fa-solid fa-gear w-6 text-secondary"></i>
+          <span>الإعدادات</span>
+        </a>
+      </nav>
+      
+      <!-- Logout button -->
+      <button id="logoutBtn" class="flex items-center gap-3 p-3 rounded-xl hover-card w-full mt-8" style="color: #ef4444;">
+        <i class="fa-solid fa-arrow-right-from-bracket w-6"></i>
+        <span>تسجيل الخروج</span>
+      </button>
+      
+    </aside>
+    
+    <!-- ===== Main Content ===== -->
+    <main class="flex-1 overflow-y-auto">
+      
+      <!-- Top bar -->
+      <div class="bg-secondary border-b border-custom sticky top-0 z-30">
+        <div class="container mx-auto px-4 md:px-8">
+          <div class="flex justify-between items-center h-20">
+            
+            <!-- Page title -->
+            <h1 class="text-2xl font-bold" style="color: var(--text-primary);">لوحة التحكم</h1>
+            
+            <!-- Right section -->
+            <div class="flex items-center gap-4">
+              
+              <!-- Notifications -->
+              <button class="relative">
+                <i class="fa-regular fa-bell text-2xl" style="color: var(--text-primary);"></i>
+                <span class="absolute -top-1 -right-1 gradient-card-red text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">٣</span>
+              </button>
+              
+              <!-- Messages -->
+              <button class="relative hidden md:block">
+                <i class="fa-regular fa-message text-2xl" style="color: var(--text-primary);"></i>
+                <span class="absolute -top-1 -right-1 gradient-card-green text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">٥</span>
+              </button>
+              
+              <!-- User menu -->
+              <div class="flex items-center gap-3">
+                <div class="text-right hidden md:block">
+                  <p class="font-bold" style="color: var(--text-primary);">أحمد محمد</p>
+                  <p class="text-xs text-secondary">٣ ثانوي - علمي</p>
+                </div>
+                <div class="gradient-card w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  أ
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Content -->
+      <div class="container mx-auto px-4 md:px-8 py-8">
+        
+        <!-- Welcome section -->
+        <div class="gradient-card rounded-3xl p-8 mb-8 animate-slide">
+          <h2 class="text-3xl md:text-4xl font-black text-white mb-2">
+            مرحباً أحمد! 👋
+          </h2>
+          <p class="text-white/80 text-lg">عندك ٣ دروس مستنية النهاردة</p>
+          
+          <!-- Quick stats -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div class="bg-white/10 rounded-2xl p-4 text-center">
+              <p class="text-2xl font-bold text-white">١٢</p>
+              <p class="text-sm text-white/70">درس مكتمل</p>
+            </div>
+            <div class="bg-white/10 rounded-2xl p-4 text-center">
+              <p class="text-2xl font-bold text-white">٨٥٪</p>
+              <p class="text-sm text-white/70">متوسط الدرجات</p>
+            </div>
+            <div class="bg-white/10 rounded-2xl p-4 text-center">
+              <p class="text-2xl font-bold text-white">٤</p>
+              <p class="text-sm text-white/70">امتحانات متبقية</p>
+            </div>
+            <div class="bg-white/10 rounded-2xl p-4 text-center">
+              <p class="text-2xl font-bold text-white">🔥 ٧</p>
+              <p class="text-sm text-white/70">أيام متتالية</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stats cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          
+          <div class="card rounded-2xl p-6 animate-slide delay-1">
+            <div class="flex items-center justify-between mb-4">
+              <div class="gradient-card w-12 h-12 rounded-xl flex items-center justify-center">
+                <i class="fa-regular fa-book-open text-white text-xl"></i>
+              </div>
+              <span class="text-green-500 text-sm bg-green-500/10 px-3 py-1 rounded-full">+١٢٪</span>
+            </div>
+            <p class="text-secondary text-sm mb-1">إجمالي الدروس</p>
+            <p class="text-3xl font-bold" style="color: var(--text-primary);">٤٨</p>
+          </div>
+          
+          <div class="card rounded-2xl p-6 animate-slide delay-2">
+            <div class="flex items-center justify-between mb-4">
+              <div class="gradient-card-green w-12 h-12 rounded-xl flex items-center justify-center">
+                <i class="fa-regular fa-clock text-white text-xl"></i>
+              </div>
+              <span class="text-green-500 text-sm bg-green-500/10 px-3 py-1 rounded-full">+٨٪</span>
+            </div>
+            <p class="text-secondary text-sm mb-1">ساعات المذاكرة</p>
+            <p class="text-3xl font-bold" style="color: var(--text-primary);">١٢٤</p>
+          </div>
+          
+          <div class="card rounded-2xl p-6 animate-slide delay-3">
+            <div class="flex items-center justify-between mb-4">
+              <div class="gradient-card-orange w-12 h-12 rounded-xl flex items-center justify-center">
+                <i class="fa-regular fa-pen-to-square text-white text-xl"></i>
+              </div>
+              <span class="text-yellow-500 text-sm bg-yellow-500/10 px-3 py-1 rounded-full">+٢٣٪</span>
+            </div>
+            <p class="text-secondary text-sm mb-1">الامتحانات</p>
+            <p class="text-3xl font-bold" style="color: var(--text-primary);">٣٢</p>
+          </div>
+          
+          <div class="card rounded-2xl p-6 animate-slide delay-4">
+            <div class="flex items-center justify-between mb-4">
+              <div class="gradient-card-red w-12 h-12 rounded-xl flex items-center justify-center">
+                <i class="fa-regular fa-star text-white text-xl"></i>
+              </div>
+              <span class="text-blue-500 text-sm bg-blue-500/10 px-3 py-1 rounded-full">+٥٪</span>
+            </div>
+            <p class="text-secondary text-sm mb-1">النقاط</p>
+            <p class="text-3xl font-bold" style="color: var(--text-primary);">٢٬٤٥٠</p>
+          </div>
+          
+        </div>
+        
+        <!-- Progress section -->
+        <div class="grid lg:grid-cols-3 gap-6 mb-8">
+          
+          <!-- Progress chart -->
+          <div class="card rounded-2xl p-6 lg:col-span-2">
+            <h3 class="text-xl font-bold mb-6" style="color: var(--text-primary);">تقدم المواد</h3>
+            
+            <div class="space-y-6">
+              <div>
+                <div class="flex justify-between text-sm mb-2">
+                  <span style="color: var(--text-primary);">الجبر</span>
+                  <span class="font-bold text-blue-600">٧٥٪</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                  <div class="gradient-card h-3 rounded-full" style="width: 75%;"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between text-sm mb-2">
+                  <span style="color: var(--text-primary);">الهندسة</span>
+                  <span class="font-bold text-purple-600">٦٠٪</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                  <div class="bg-purple-600 h-3 rounded-full" style="width: 60%;"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between text-sm mb-2">
+                  <span style="color: var(--text-primary);">التفاضل</span>
+                  <span class="font-bold text-yellow-600">٤٥٪</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                  <div class="bg-yellow-600 h-3 rounded-full" style="width: 45%;"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between text-sm mb-2">
+                  <span style="color: var(--text-primary);">حساب المثلثات</span>
+                  <span class="font-bold text-green-600">٣٠٪</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                  <div class="bg-green-600 h-3 rounded-full" style="width: 30%;"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-blue-500/10 rounded-xl">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-secondary text-sm">المعدل العام</p>
+                  <p class="text-3xl font-bold text-blue-600">٥٢٫٥٪</p>
+                </div>
+                <div class="text-left">
+                  <p class="text-secondary text-sm">المتبقي</p>
+                  <p class="text-xl font-bold" style="color: var(--text-primary);">٤٨ ساعة</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recent activities -->
+          <div class="card rounded-2xl p-6">
+            <h3 class="text-xl font-bold mb-6" style="color: var(--text-primary);">آخر الأنشطة</h3>
+            
+            <div class="space-y-4">
+              <div class="flex items-center gap-3 p-3 rounded-xl hover-card">
+                <div class="gradient-card-green w-10 h-10 rounded-xl flex items-center justify-center">
+                  <i class="fa-regular fa-circle-check text-white"></i>
+                </div>
+                <div>
+                  <p class="font-bold" style="color: var(--text-primary);">امتحان الجبر</p>
+                  <p class="text-xs text-secondary">منذ ساعتين</p>
+                </div>
+                <span class="mr-auto text-green-600">+٩٥٪</span>
+              </div>
+              
+              <div class="flex items-center gap-3 p-3 rounded-xl hover-card">
+                <div class="gradient-card-orange w-10 h-10 rounded-xl flex items-center justify-center">
+                  <i class="fa-regular fa-play-circle text-white"></i>
+                </div>
+                <div>
+                  <p class="font-bold" style="color: var(--text-primary);">درس المشتقات</p>
+                  <p class="text-xs text-secondary">منذ ٥ ساعات</p>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-3 p-3 rounded-xl hover-card">
+                <div class="gradient-card-red w-10 h-10 rounded-xl flex items-center justify-center">
+                  <i class="fa-regular fa-clock text-white"></i>
+                </div>
+                <div>
+                  <p class="font-bold" style="color: var(--text-primary);">تمرين المثلثات</p>
+                  <p class="text-xs text-secondary">أمس</p>
+                </div>
+              </div>
+            </div>
+            
+            <button class="w-full mt-4 p-3 rounded-xl border border-custom hover-card" style="color: var(--text-primary);">
+              عرض كل الأنشطة
+            </button>
+          </div>
+          
+        </div>
+        
+        <!-- Recent lessons -->
+        <div class="card rounded-2xl p-6 mb-8">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold" style="color: var(--text-primary);">آخر الدروس</h3>
+            <a href="#" class="text-blue-600 hover:text-blue-700 text-sm">عرض الكل</a>
+          </div>
+          
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <div class="card p-4 rounded-xl hover-card">
+              <div class="flex justify-between items-start mb-2">
+                <span class="gradient-card text-white text-xs px-3 py-1 rounded-full">درس ١</span>
+                <span class="text-xs text-secondary">منذ يوم</span>
+              </div>
+              <h4 class="font-bold mb-1" style="color: var(--text-primary);">المعادلات الخطية</h4>
+              <p class="text-secondary text-sm mb-3">الجبر - الصف الأول</p>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-secondary">٤٥ دقيقة</span>
+                <button class="text-blue-600 hover:text-blue-700">
+                  <i class="fa-regular fa-play-circle text-xl"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="card p-4 rounded-xl hover-card">
+              <div class="flex justify-between items-start mb-2">
+                <span class="gradient-card-green text-white text-xs px-3 py-1 rounded-full">درس ٢</span>
+                <span class="text-xs text-secondary">منذ ٣ أيام</span>
+              </div>
+              <h4 class="font-bold mb-1" style="color: var(--text-primary);">المشتقات</h4>
+              <p class="text-secondary text-sm mb-3">التفاضل - الصف الثالث</p>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-secondary">٦٠ دقيقة</span>
+                <button class="text-blue-600 hover:text-blue-700">
+                  <i class="fa-regular fa-play-circle text-xl"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="card p-4 rounded-xl hover-card">
+              <div class="flex justify-between items-start mb-2">
+                <span class="gradient-card-orange text-white text-xs px-3 py-1 rounded-full">درس ٣</span>
+                <span class="text-xs text-secondary">منذ أسبوع</span>
+              </div>
+              <h4 class="font-bold mb-1" style="color: var(--text-primary);">المثلثات</h4>
+              <p class="text-secondary text-sm mb-3">الهندسة - الصف الثاني</p>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-secondary">٥٠ دقيقة</span>
+                <button class="text-blue-600 hover:text-blue-700">
+                  <i class="fa-regular fa-play-circle text-xl"></i>
+                </button>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- Upcoming exams -->
+        <div class="grid md:grid-cols-2 gap-6">
+          
+          <div class="card rounded-2xl p-6">
+            <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">الامتحانات القادمة</h3>
+            
+            <div class="space-y-3">
+              <div class="flex items-center p-3 rounded-xl hover-card">
+                <div class="gradient-card-red w-10 h-10 rounded-xl flex items-center justify-center ml-3">
+                  <i class="fa-regular fa-calendar text-white"></i>
+                </div>
+                <div>
+                  <p class="font-bold" style="color: var(--text-primary);">امتحان الجبر</p>
+                  <p class="text-xs text-secondary">الخميس ١٠ صباحاً</p>
+                </div>
+                <span class="mr-auto bg-red-500/10 text-red-600 px-3 py-1 rounded-full text-sm">بعد يومين</span>
+              </div>
+              
+              <div class="flex items-center p-3 rounded-xl hover-card">
+                <div class="gradient-card-orange w-10 h-10 rounded-xl flex items-center justify-center ml-3">
+                  <i class="fa-regular fa-calendar text-white"></i>
+                </div>
+                <div>
+                  <p class="font-bold" style="color: var(--text-primary);">امتحان التفاضل</p>
+                  <p class="text-xs text-secondary">السبت ٢ ظهراً</p>
+                </div>
+                <span class="mr-auto bg-yellow-500/10 text-yellow-600 px-3 py-1 rounded-full text-sm">بعد ٥ أيام</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card rounded-2xl p-6">
+            <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">الإنجازات</h3>
+            
+            <div class="grid grid-cols-3 gap-3">
+              <div class="text-center p-3 rounded-xl hover-card">
+                <div class="text-3xl mb-2">🔥</div>
+                <p class="text-xs font-bold" style="color: var(--text-primary);">٧ أيام</p>
+              </div>
+              <div class="text-center p-3 rounded-xl hover-card opacity-50">
+                <div class="text-3xl mb-2">⚡</div>
+                <p class="text-xs font-bold" style="color: var(--text-primary);">١٠٠ مسألة</p>
+              </div>
+              <div class="text-center p-3 rounded-xl hover-card">
+                <div class="text-3xl mb-2">📚</div>
+                <p class="text-xs font-bold" style="color: var(--text-primary);">١٠ دروس</p>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    
+    // Check for saved preference
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      document.documentElement.classList.add('dark');
+      darkModeToggle.checked = true;
+    }
+    
+    darkModeToggle.addEventListener('change', function() {
+      if (this.checked) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('darkMode', 'enabled');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('darkMode', 'disabled');
+      }
+    });
+    
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    
+    mobileMenuBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('-translate-x-full');
+    });
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      if (window.innerWidth < 768) {
+        if (!sidebar.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+          sidebar.classList.add('-translate-x-full');
+        }
+      }
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      if (confirm('هل تريد تسجيل الخروج؟')) {
+        window.location.href = 'login.html';
+      }
+    });
+  </script>
+  
+</body>
+</html>
