@@ -1,0 +1,29 @@
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } 
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyByKmG7LLj9JMq2O94gS1-da2Kt8ghLzMo",
+    authDomain: "math-e62c9.firebaseapp.com",
+    projectId: "math-e62c9",
+    storageBucket: "math-e62c9.appspot.com",
+    messagingSenderId: "271507842148",
+    appId: "1:271507842148:web:2907aad4caf67afd08ab71"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  document.getElementById("loginBtn").addEventListener("click", async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "dashboard.html";
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+</script>
