@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathMaster - الدرس</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen" style="font-family: 'Tajawal', sans-serif;">
+
+  <div class="container mx-auto px-4 py-8">
+    
+    <!-- header -->
+    <div class="bg-white rounded-3xl shadow-xl p-6 mb-6 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-calculator text-blue-600 text-3xl"></i>
+        <h1 class="text-2xl font-bold text-gray-800">MathMaster</h1>
+        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">درس</span>
+      </div>
+      <button onclick="window.location.href='student-dashboard.html'" 
+              class="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50">
+        <i class="fa-regular fa-arrow-right ml-1"></i>
+        رجوع
+      </button>
+    </div>
+
+    <!-- محتوى الدرس -->
+    <div class="grid lg:grid-cols-3 gap-6">
+      
+      <!-- الجزء الأيمن: الفيديو والمعلومات -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <!-- عنوان الدرس -->
+        <div class="bg-white rounded-3xl shadow-xl p-6">
+          <h2 class="text-3xl font-black text-gray-800 mb-2" id="lessonTitle">المعادلات الخطية</h2>
+          <p class="text-gray-600 mb-4" id="lessonDesc">شرح المعادلات الخطية من الصفر</p>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
+              <i class="fa-regular fa-user ml-1"></i>
+              د. أحمد
+            </span>
+            <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
+              <i class="fa-regular fa-key ml-1"></i>
+              <span id="displayCode">MATH-2024-001</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- الفيديو -->
+        <div class="bg-white rounded-3xl shadow-xl p-4">
+          <div class="relative pb-[56.25%] h-0 rounded-2xl overflow-hidden">
+            <iframe id="videoFrame" class="absolute top-0 left-0 w-full h-full" 
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                    frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <!-- تأكيد المشاهدة -->
+        <div class="bg-white rounded-3xl shadow-xl p-6">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" id="watchedVideo" class="w-6 h-6 accent-blue-600">
+            <span class="text-lg font-bold text-gray-700">✅ تأكيد مشاهدة الفيديو</span>
+          </label>
+          <p class="text-sm text-gray-500 mt-2">لازم تشاهد الفيديو قبل ما تبدأ الامتحان</p>
+        </div>
+
+      </div>
+
+      <!-- الجزء الأيسر: الامتحان -->
+      <div class="space-y-6">
+        
+        <div class="bg-white rounded-3xl shadow-xl p-6 sticky top-24">
+          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+            <i class="fa-regular fa-pen-to-square text-green-600"></i>
+            الامتحان
+          </h3>
+
+          <div class="space-y-3 mb-6">
+            <div class="flex justify-between">
+              <span class="text-gray-600">عدد الأسئلة:</span>
+              <span class="font-bold" id="totalQuestions">١٠</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">الوقت:</span>
+              <span class="font-bold" id="examTimeLabel">٢٠ دقيقة</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">درجة النجاح:</span>
+              <span class="font-bold" id="passScoreLabel">٧٠٪</span>
+            </div>
+          </div>
+
+          <button id="startExamBtn" disabled 
+                  class="w-full bg-gray-400 text-white p-4 rounded-2xl font-bold cursor-not-allowed flex items-center justify-center gap-2">
+            <i class="fa-regular fa-lock"></i>
+            شاهد الفيديو أولاً
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- قسم الامتحان (يظهر بعد الضغط) -->
+    <div id="examSection" class="hidden mt-8">
+      <div class="bg-white rounded-3xl shadow-xl p-8">
+        
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold">الامتحان</h3>
+          <div class="bg-red-100 text-red-600 px-4 py-2 rounded-full">
+            <i class="fa-regular fa-clock ml-1"></i>
+            <span id="timer">٢٠:٠٠</span>
+          </div>
+        </div>
+
+        <!-- الأسئلة هنا -->
+        <div id="examQuestions" class="space-y-6">
+          <!-- هتتحط dynamically -->
+        </div>
+
+        <div class="flex justify-between mt-8">
+          <button onclick="prevQuestion()" class="px-6 py-3 border border-gray-200 rounded-xl hover:bg-gray-50">
+            السابق
+          </button>
+          <button onclick="nextQuestion()" class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
+            التالي
+          </button>
+        </div>
+
+        <button onclick="submitExam()" class="w-full mt-6 bg-green-600 text-white p-4 rounded-2xl font-bold hover:bg-green-700">
+          إنهاء الامتحان
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // تفعيل زر الامتحان عند مشاهدة الفيديو
+    document.getElementById('watchedVideo').addEventListener('change', function(e) {
+      const btn = document.getElementById('startExamBtn');
+      if (e.target.checked) {
+        btn.disabled = false;
+        btn.className = 'w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-2xl font-bold hover:opacity-90';
+        btn.innerHTML = '<i class="fa-regular fa-pen-to-square ml-2"></i> بدء الامتحان';
+      } else {
+        btn.disabled = true;
+        btn.className = 'w-full bg-gray-400 text-white p-4 rounded-2xl font-bold cursor-not-allowed';
+        btn.innerHTML = '<i class="fa-regular fa-lock"></i> شاهد الفيديو أولاً';
+      }
+    });
+
+    // بدء الامتحان
+    document.getElementById('startExamBtn').addEventListener('click', function() {
+      document.getElementById('examSection').classList.remove('hidden');
+      document.getElementById('examSection').scrollIntoView({ behavior: 'smooth' });
+      startTimer();
+    });
+
+    // مؤقت
+    let timeLeft = 20 * 60;
+    function startTimer() {
+      const timer = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById('timer').textContent = 
+          `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          submitExam();
+        }
+      }, 1000);
+    }
+
+    // إنهاء الامتحان
+    function submitExam() {
+      alert('✅ تم إنهاء الامتحان بنجاح');
+      // هنا هنضيف حساب الدرجات
+    }
+
+    // جلب الكود من الرابط
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code) {
+      document.getElementById('displayCode').textContent = code;
+    }
+  </script>
+</body>
+</html>
