@@ -17,7 +17,6 @@
       background: linear-gradient(135deg, #f5f7fa 0%, #e9eef5 100%);
     }
     
-    /* بطاقة الدرس */
     .lesson-card {
       transition: all 0.3s ease;
       border-bottom: 3px solid transparent;
@@ -29,46 +28,23 @@
       border-bottom-color: #3b82f6;
     }
     
-    /* بطاقة الكود */
     .code-card {
       background: linear-gradient(135deg, #667eea, #764ba2);
     }
     
-    /* حالة الإنجاز */
-    .badge-completed {
-      background: #22c55e20;
-      color: #16a34a;
-      border: 1px solid #22c55e;
-    }
-    
-    .badge-pending {
-      background: #eab30820;
-      color: #ca8a04;
-      border: 1px solid #eab308;
-    }
-    
-    /* شريط التقدم */
-    .progress-bar {
-      transition: width 0.5s ease;
-    }
-    
-    /* تأثير النبض */
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    
-    .pulse-animation {
-      animation: pulse 2s infinite;
-    }
-    
-    /* كود الوصول */
-    .access-code-badge {
+    /* تحسين شكل حقل الكود */
+    #accessCodeInput {
       font-family: 'Courier New', monospace;
-      background: #f3f4f6;
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: 14px;
+      letter-spacing: 2px;
+      direction: ltr;
+      text-align: center;
+    }
+    
+    /* رسالة الخطأ */
+    .error-message {
+      background: #fee2e2;
+      border: 1px solid #ef4444;
+      color: #b91c1c;
     }
   </style>
 </head>
@@ -79,14 +55,12 @@
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center h-16">
         
-        <!-- الشعار -->
         <div class="flex items-center gap-3">
           <i class="fa-solid fa-calculator text-blue-600 text-2xl"></i>
           <h1 class="text-xl font-bold text-blue-700 hidden sm:block">MathMaster</h1>
           <span class="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full mr-4">طالب</span>
         </div>
         
-        <!-- معلومات المستخدم -->
         <div class="flex items-center gap-4">
           <button class="relative">
             <i class="fa-regular fa-bell text-gray-600 text-xl"></i>
@@ -120,6 +94,12 @@
       <h2 class="text-3xl font-black mb-2">مرحباً أحمد! 👋</h2>
       <p class="text-white/80 mb-4">استعد لامتحاناتك وحسن مستواك في الرياضيات</p>
       
+      <!-- رسالة خطأ (تظهر عند الحاجة) -->
+      <div id="errorMessage" class="error-message rounded-xl p-4 mb-4 hidden">
+        <i class="fa-regular fa-circle-exclamation ml-2"></i>
+        <span id="errorText">كود غير صحيح</span>
+      </div>
+      
       <!-- إحصائيات سريعة -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
         <div class="bg-white/10 rounded-2xl p-4 text-center">
@@ -141,7 +121,7 @@
       </div>
     </div>
     
-    <!-- ===== قسم إدخال الكود (الأهم) ===== -->
+    <!-- ===== قسم إدخال الكود ===== -->
     <div class="bg-white rounded-3xl shadow-xl p-6 mb-8">
       <div class="flex flex-col md:flex-row items-center gap-4">
         <div class="flex-1">
@@ -153,7 +133,8 @@
         </div>
         <div class="flex-1 flex gap-2">
           <input type="text" id="accessCodeInput" placeholder="مثال: MATH-2024-001" 
-                 class="flex-1 p-4 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-center font-mono"
+                 class="flex-1 p-4 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-center font-mono text-lg"
+                 value="MATH-2026-H5QM"
                  oninput="this.value = this.value.toUpperCase()">
           <button onclick="verifyCode()" 
                   class="code-card text-white px-8 py-4 rounded-2xl font-bold hover:opacity-90 transition flex items-center gap-2">
@@ -163,18 +144,10 @@
         </div>
       </div>
       
-      <!-- آخر الأكواد المستخدمة -->
-      <div class="flex gap-2 mt-4 justify-center">
-        <span class="text-sm text-gray-500">آخر الأكواد:</span>
-        <button onclick="setCode('MATH-2024-001')" class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition">
-          MATH-001
-        </button>
-        <button onclick="setCode('MATH-2024-002')" class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition">
-          MATH-002
-        </button>
-        <button onclick="setCode('MATH-2024-003')" class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition">
-          MATH-003
-        </button>
+      <!-- رسالة توضيحية -->
+      <div class="mt-4 text-center text-sm text-gray-500">
+        <i class="fa-regular fa-circle-info ml-1"></i>
+        الكود بيبقى عند المدرس. لو مش واصلک كود، تواصل مع مدرسك
       </div>
     </div>
     
@@ -204,7 +177,7 @@
             <i class="fa-regular fa-circle-check"></i>
             مكتمل
           </span>
-          <span class="access-code-badge">MATH-001</span>
+          <span class="bg-gray-100 px-3 py-1 rounded-full text-sm font-mono">MATH-2024-001</span>
         </div>
         
         <h4 class="font-bold text-lg mb-2">الجبر - المعادلات الخطية</h4>
@@ -219,7 +192,6 @@
           </span>
         </div>
         
-        <!-- شريط التقدم -->
         <div class="mb-4">
           <div class="flex justify-between text-xs mb-1">
             <span>التقدم</span>
@@ -230,76 +202,35 @@
           </div>
         </div>
         
-        <button onclick="window.location.href='student-lesson.html?code=MATH-001'" 
+        <button onclick="window.location.href='student-lesson.html?code=MATH-2024-001'" 
                 class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
           <i class="fa-regular fa-rotate-left ml-2"></i>
           مراجعة الدرس
         </button>
       </div>
       
-      <!-- درس 2 - قيد التقدم -->
-      <div class="lesson-card bg-white rounded-2xl shadow p-6">
+      <!-- درس 2 - جديد (نفس الكود اللي في الصورة) -->
+      <div class="lesson-card bg-white rounded-2xl shadow p-6 border-2 border-blue-200">
         <div class="flex justify-between items-start mb-3">
-          <span class="bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
-            <i class="fa-regular fa-clock"></i>
-            قيد التقدم
+          <span class="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
+            <i class="fa-regular fa-play"></i>
+            جديد
           </span>
-          <span class="access-code-badge">MATH-002</span>
+          <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-mono font-bold">MATH-2026-H5QM</span>
         </div>
         
-        <h4 class="font-bold text-lg mb-2">الهندسة - المثلثات</h4>
-        <p class="text-gray-600 text-sm mb-4">د. أحمد عبدالله • الصف الأول الثانوي</p>
+        <h4 class="font-bold text-lg mb-2">التفاضل - قواعد الاشتقاق</h4>
+        <p class="text-gray-600 text-sm mb-4">د. أحمد عبدالله • الصف الثالث الثانوي</p>
         
         <div class="flex items-center justify-between text-sm mb-3">
           <span class="text-gray-500">
             <i class="fa-regular fa-clock ml-1"></i> ٦٠ دقيقة
           </span>
           <span class="text-gray-500">
-            <i class="fa-regular fa-star text-yellow-400 ml-1"></i> ٦٠٪
-          </span>
-        </div>
-        
-        <!-- شريط التقدم -->
-        <div class="mb-4">
-          <div class="flex justify-between text-xs mb-1">
-            <span>التقدم</span>
-            <span class="font-bold">٦٠٪</span>
-          </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div class="bg-blue-600 h-2 rounded-full" style="width: 60%;"></div>
-          </div>
-        </div>
-        
-        <button onclick="window.location.href='student-lesson.html?code=MATH-002'" 
-                class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
-          <i class="fa-regular fa-play-circle ml-2"></i>
-          أكمل الدرس
-        </button>
-      </div>
-      
-      <!-- درس 3 - جديد (لم يبدأ) -->
-      <div class="lesson-card bg-white rounded-2xl shadow p-6">
-        <div class="flex justify-between items-start mb-3">
-          <span class="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
-            <i class="fa-regular fa-play"></i>
-            جديد
-          </span>
-          <span class="access-code-badge">MATH-003</span>
-        </div>
-        
-        <h4 class="font-bold text-lg mb-2">التفاضل - المشتقات</h4>
-        <p class="text-gray-600 text-sm mb-4">د. أحمد عبدالله • الصف الثالث الثانوي</p>
-        
-        <div class="flex items-center justify-between text-sm mb-3">
-          <span class="text-gray-500">
-            <i class="fa-regular fa-clock ml-1"></i> ٩٠ دقيقة
-          </span>
-          <span class="text-gray-500">
             <i class="fa-regular fa-star ml-1"></i> لم يبدأ
           </span>
         </div>
         
-        <!-- شريط التقدم -->
         <div class="mb-4">
           <div class="flex justify-between text-xs mb-1">
             <span>التقدم</span>
@@ -310,173 +241,13 @@
           </div>
         </div>
         
-        <button onclick="window.location.href='student-lesson.html?code=MATH-003'" 
+        <button onclick="window.location.href='student-lesson.html?code=MATH-2026-H5QM'" 
                 class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition">
           <i class="fa-regular fa-play-circle ml-2"></i>
           ابدأ الدرس
         </button>
       </div>
       
-    </div>
-    
-    <!-- ===== قسم التقدم والإحصائيات ===== -->
-    <div class="grid md:grid-cols-2 gap-6 mb-8">
-      
-      <!-- تقدم المواد -->
-      <div class="bg-white rounded-2xl shadow p-6">
-        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-line text-blue-600"></i>
-          تقدمك في المواد
-        </h3>
-        
-        <div class="space-y-4">
-          <div>
-            <div class="flex justify-between text-sm mb-1">
-              <span>الجبر</span>
-              <span class="font-bold">٨٥٪</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div class="bg-blue-600 h-2.5 rounded-full" style="width: 85%;"></div>
-            </div>
-          </div>
-          
-          <div>
-            <div class="flex justify-between text-sm mb-1">
-              <span>الهندسة</span>
-              <span class="font-bold">٦٠٪</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div class="bg-purple-600 h-2.5 rounded-full" style="width: 60%;"></div>
-            </div>
-          </div>
-          
-          <div>
-            <div class="flex justify-between text-sm mb-1">
-              <span>التفاضل</span>
-              <span class="font-bold">٣٠٪</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div class="bg-yellow-600 h-2.5 rounded-full" style="width: 30%;"></div>
-            </div>
-          </div>
-          
-          <div>
-            <div class="flex justify-between text-sm mb-1">
-              <span>حساب المثلثات</span>
-              <span class="font-bold">٤٥٪</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div class="bg-green-600 h-2.5 rounded-full" style="width: 45%;"></div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="mt-4 p-4 bg-blue-50 rounded-xl">
-          <div class="flex justify-between items-center">
-            <span class="text-gray-700">المعدل العام</span>
-            <span class="text-2xl font-black text-blue-600">٥٥٪</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- آخر الامتحانات -->
-      <div class="bg-white rounded-2xl shadow p-6">
-        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-          <i class="fa-regular fa-clock text-blue-600"></i>
-          آخر الامتحانات
-        </h3>
-        
-        <div class="space-y-3">
-          
-          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-            <div>
-              <p class="font-bold">امتحان الجبر</p>
-              <p class="text-xs text-gray-500">منذ يومين</p>
-            </div>
-            <div class="text-center">
-              <span class="font-bold text-green-600">٩٥٪</span>
-            </div>
-          </div>
-          
-          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-            <div>
-              <p class="font-bold">امتحان الهندسة</p>
-              <p class="text-xs text-gray-500">منذ ٥ أيام</p>
-            </div>
-            <div class="text-center">
-              <span class="font-bold text-yellow-600">٧٠٪</span>
-            </div>
-          </div>
-          
-          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-            <div>
-              <p class="font-bold">امتحان التفاضل</p>
-              <p class="text-xs text-gray-500">منذ أسبوع</p>
-            </div>
-            <div class="text-center">
-              <span class="font-bold text-red-600">٤٥٪</span>
-            </div>
-          </div>
-          
-        </div>
-        
-        <button class="w-full mt-4 border-2 border-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-50 transition">
-          عرض كل الامتحانات
-        </button>
-      </div>
-      
-    </div>
-    
-    <!-- ===== الامتحانات القادمة ===== -->
-    <div class="bg-white rounded-2xl shadow p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold flex items-center gap-2">
-          <i class="fa-regular fa-calendar-check text-blue-600"></i>
-          الامتحانات القادمة
-        </h3>
-        <a href="#" class="text-blue-600 text-sm hover:text-blue-800">جدول الامتحانات</a>
-      </div>
-      
-      <div class="grid md:grid-cols-2 gap-4">
-        
-        <div class="flex items-center gap-4 p-4 bg-amber-50 rounded-xl">
-          <div class="bg-amber-100 p-3 rounded-xl">
-            <i class="fa-solid fa-pen-to-square text-amber-600"></i>
-          </div>
-          <div class="flex-1">
-            <p class="font-bold">امتحان الجبر - الأسبوع الثالث</p>
-            <p class="text-sm text-gray-500">الخميس ١٨ يناير - ١٠ صباحاً</p>
-          </div>
-          <span class="bg-amber-200 text-amber-800 px-3 py-1 rounded-full text-sm whitespace-nowrap">
-            بعد ٣ أيام
-          </span>
-        </div>
-        
-        <div class="flex items-center gap-4 p-4 bg-blue-50 rounded-xl">
-          <div class="bg-blue-100 p-3 rounded-xl">
-            <i class="fa-solid fa-pen-to-square text-blue-600"></i>
-          </div>
-          <div class="flex-1">
-            <p class="font-bold">امتحان الهندسة - شهر فبراير</p>
-            <p class="text-sm text-gray-500">الثلاثاء ١ فبراير - ١٢ ظهراً</p>
-          </div>
-          <span class="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-sm whitespace-nowrap">
-            بعد ١٥ يوم
-          </span>
-        </div>
-        
-      </div>
-    </div>
-    
-    <!-- ===== نصائح سريعة ===== -->
-    <div class="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
-      <div class="flex items-start gap-4">
-        <div class="text-3xl">💡</div>
-        <div>
-          <h4 class="font-bold text-lg mb-1">نصيحة اليوم</h4>
-          <p class="text-gray-700">خصص ٣٠ دقيقة يومياً لمراجعة المسائل اللي فاتتك، هتلاقي نتيجة كبيرة في الامتحانات</p>
-        </div>
-      </div>
     </div>
     
   </div>
@@ -499,7 +270,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
   
-    // التحقق من تسجيل الدخول
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "login.html";
@@ -509,7 +279,6 @@
       }
     });
   
-    // تسجيل الخروج
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       try {
         await signOut(auth);
@@ -521,13 +290,54 @@
   </script>
 
   <script>
-    // تعيين كود في حقل الإدخال
-    function setCode(code) {
-      document.getElementById('accessCodeInput').value = code;
+    // التحقق من الكود - نسخة مطورة
+    function verifyCode() {
+      const code = document.getElementById('accessCodeInput').value.trim();
+      const errorDiv = document.getElementById('errorMessage');
+      const errorText = document.getElementById('errorText');
+      
+      // إخفاء أي رسالة خطأ سابقة
+      errorDiv.classList.add('hidden');
+      
+      if (!code) {
+        errorText.textContent = '❌ من فضلك أدخل كود الوصول';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      // التحقق من شكل الكود (يبدأ بـ MATH-)
+      if (!code.startsWith('MATH-')) {
+        errorText.textContent = '❌ كود غير صحيح. الكود يجب أن يبدأ بـ MATH-';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      // هنا في التطبيق الحقيقي، هتتحقق من Firebase
+      // هل الكود موجود في الدروس؟
+      
+      console.log('محاولة دخول بالكود:', code);
+      
+      // مؤقتاً: أي كود يبدأ بـ MATH- يشتغل
+      // ده عشان تقدر تجرب
+      
+      // عرض رسالة تحميل
+      const btn = event.target;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin ml-2"></i> جاري...';
+      btn.disabled = true;
+      
+      setTimeout(() => {
+        // تخزين الكود
+        sessionStorage.setItem('currentLessonCode', code);
+        
+        // التوجيه لصفحة الدرس
+        window.location.href = `student-lesson.html?code=${code}`;
+      }, 1000);
     }
     
-    // التحقق من الكود والتوجيه
-    function verifyCode() {
+    /*
+    // النسخة النهائية مع Firebase (هنفعلها بعد ما نربط Firebase)
+    async function verifyCode() {
       const code = document.getElementById('accessCodeInput').value.trim();
       
       if (!code) {
@@ -535,16 +345,28 @@
         return;
       }
       
-      // في التطبيق الحقيقي، هنتأكد من الكود في Firebase
-      // مؤقتاً بنستخدم أكود تجريبية
-      const validCodes = ['MATH-2024-001', 'MATH-2024-002', 'MATH-2024-003', 'MATH-001', 'MATH-002', 'MATH-003'];
-      
-      if (validCodes.includes(code)) {
-        sessionStorage.setItem('currentLessonCode', code);
-        window.location.href = `student-lesson.html?code=${code}`;
-      } else {
-        alert('❌ كود غير صحيح. تأكد من الكود وحاول مرة أخرى');
+      try {
+        // البحث عن درس بهذا الكود في Firebase
+        const q = query(collection(db, 'lessons'), where('accessCode', '==', code));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          // الكود موجود
+          sessionStorage.setItem('currentLessonCode', code);
+          window.location.href = `student-lesson.html?code=${code}`;
+        } else {
+          alert('❌ كود غير صحيح. تأكد من الكود وحاول مرة أخرى');
+        }
+      } catch (error) {
+        console.error('خطأ:', error);
+        alert('❌ حدث خطأ في التحقق من الكود');
       }
+    }
+    */
+    
+    // تعيين كود في حقل الإدخال
+    function setCode(code) {
+      document.getElementById('accessCodeInput').value = code;
     }
     
     // دخول بالضغط على Enter
@@ -553,6 +375,17 @@
         verifyCode();
       }
     });
+    
+    // لو فيه كود في الرابط (من صفحة تانية)
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      if (code) {
+        document.getElementById('accessCodeInput').value = code;
+        // ننتظر شوية وبعدين نفتح الدرس تلقائي؟
+        // setTimeout(() => verifyCode(), 500);
+      }
+    };
   </script>
   
 </body>
