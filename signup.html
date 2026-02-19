@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathMaster - إنشاء حساب جديد</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-600 to-purple-700 min-h-screen flex items-center justify-center p-4" style="font-family: 'Tajawal', sans-serif;">
+
+  <!-- بطاقة التسجيل -->
+  <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 w-full max-w-2xl">
+    
+    <!-- الشعار -->
+    <div class="text-center mb-8">
+      <div class="inline-block p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg mb-4">
+        <i class="fa-solid fa-calculator text-white text-4xl"></i>
+      </div>
+      <h1 class="text-3xl font-black text-gray-800 mb-2">MathMaster</h1>
+      <p class="text-gray-600">إنشاء حساب جديد</p>
+    </div>
+    
+    <!-- رسالة خطأ -->
+    <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-4 hidden">
+      <span id="errorText"></span>
+    </div>
+    
+    <!-- رسالة نجاح -->
+    <div id="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl mb-4 hidden">
+      تم إنشاء الحساب بنجاح! جاري التحويل...
+    </div>
+    
+    <!-- نموذج التسجيل -->
+    <form id="signupForm" class="space-y-4">
+      
+      <!-- الاسم كامل -->
+      <div>
+        <label class="block text-gray-700 font-bold mb-2">
+          <i class="fa-regular fa-user ml-1 text-blue-600"></i>
+          الاسم كامل
+        </label>
+        <input type="text" id="fullName" placeholder="أدخل اسمك بالكامل" 
+               class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+      </div>
+      
+      <!-- البريد الإلكتروني -->
+      <div>
+        <label class="block text-gray-700 font-bold mb-2">
+          <i class="fa-regular fa-envelope ml-1 text-blue-600"></i>
+          البريد الإلكتروني
+        </label>
+        <input type="email" id="email" placeholder="example@email.com" 
+               class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+               dir="ltr">
+      </div>
+      
+      <!-- كلمة المرور -->
+      <div>
+        <label class="block text-gray-700 font-bold mb-2">
+          <i class="fa-regular fa-lock ml-1 text-blue-600"></i>
+          كلمة المرور
+        </label>
+        <input type="password" id="password" placeholder="********" 
+               class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+        <p class="text-xs text-gray-500 mt-1">كلمة المرور يجب أن تكون 6 أحرف على الأقل</p>
+      </div>
+      
+      <!-- الصف الدراسي (سنة كام) -->
+      <div>
+        <label class="block text-gray-700 font-bold mb-2">
+          <i class="fa-regular fa-graduation-cap ml-1 text-blue-600"></i>
+          الصف الدراسي
+        </label>
+        <select id="grade" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+          <option value="">اختر الصف الدراسي</option>
+          <option value="1ث">الصف الأول الثانوي</option>
+          <option value="2ث">الصف الثاني الثانوي</option>
+          <option value="3ث علمي">الصف الثالث الثانوي - علمي</option>
+          <option value="3ث ادبي">الصف الثالث الثانوي - أدبي</option>
+        </select>
+      </div>
+      
+      <!-- خط فاصل: بيانات ولي الأمر -->
+      <div class="relative my-6">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center">
+          <span class="px-4 bg-white text-gray-600 text-sm font-bold">بيانات ولي الأمر</span>
+        </div>
+      </div>
+      
+      <!-- اسم ولي الأمر -->
+      <div>
+        <label class="block text-gray-700 font-bold mb-2">
+          <i class="fa-regular fa-user-tie ml-1 text-blue-600"></i>
+          اسم ولي الأمر
+        </label>
+        <input type="text" id="parentName" placeholder="اسم ولي الأمر" 
+               class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+      </div>
+      
+      <!-- رقم ولي الأمر -->
+      <div>
+        <label class="block text-gray-700 font-bold mb-2">
+          <i class="fa-regular fa-mobile-screen ml-1 text-blue-600"></i>
+          رقم ولي الأمر
+        </label>
+        <input type="tel" id="parentPhone" placeholder="01XXXXXXXXX" 
+               class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+               dir="ltr">
+        <p class="text-xs text-gray-500 mt-1">مثال: 01001234567</p>
+      </div>
+      
+      <!-- رقم ولي أمر آخر (اختياري) -->
+      <div>
+        <label class="block text-gray-700 font-bold mb-2">
+          <i class="fa-regular fa-mobile-screen ml-1 text-blue-600"></i>
+          رقم ولي أمر آخر (اختياري)
+        </label>
+        <input type="tel" id="parentPhone2" placeholder="01XXXXXXXXX" 
+               class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+               dir="ltr">
+      </div>
+      
+      <!-- الموافقة على الشروط -->
+      <div class="flex items-start gap-2 mt-4">
+        <input type="checkbox" id="terms" class="w-5 h-5 accent-blue-600 mt-1">
+        <label for="terms" class="text-gray-600 text-sm">
+          أوافق على <a href="#" class="text-blue-600 hover:text-blue-800">شروط الاستخدام</a> و 
+          <a href="#" class="text-blue-600 hover:text-blue-800">سياسة الخصوصية</a>
+        </label>
+      </div>
+      
+      <!-- زر التسجيل -->
+      <button type="submit" id="signupBtn" 
+              class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-xl font-bold text-lg hover:opacity-90 transition mt-6">
+        إنشاء الحساب
+      </button>
+      
+      <!-- رابط تسجيل الدخول -->
+      <p class="text-center text-gray-600 mt-4">
+        عندك حساب بالفعل؟ 
+        <a href="login.html" class="text-blue-600 font-bold hover:text-blue-800">تسجيل الدخول</a>
+      </p>
+      
+      <!-- الرجوع للرئيسية -->
+      <div class="text-center">
+        <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm">
+          <i class="fa-regular fa-arrow-right ml-1"></i>
+          الرجوع للرئيسية
+        </a>
+      </div>
+      
+    </form>
+  </div>
+
+  <!-- Firebase Script -->
+  <script type="module">
+    console.log("✅ صفحة التسجيل تحملت");
+    
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    
+    console.log("✅ Firebase استوردت");
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyByKmG7LLj9JMq2O94gS1-da2Kt8ghLzMo",
+      authDomain: "math-e62c9.firebaseapp.com",
+      projectId: "math-e62c9",
+      storageBucket: "math-e62c9.appspot.com",
+      messagingSenderId: "271507842148",
+      appId: "1:271507842148:web:2907aad4caf67afd08ab71"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    console.log("✅ Firebase initialized");
+
+    // عناصر الصفحة
+    const form = document.getElementById('signupForm');
+    const fullName = document.getElementById('fullName');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const grade = document.getElementById('grade');
+    const parentName = document.getElementById('parentName');
+    const parentPhone = document.getElementById('parentPhone');
+    const parentPhone2 = document.getElementById('parentPhone2');
+    const terms = document.getElementById('terms');
+    const errorDiv = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    const successDiv = document.getElementById('successMessage');
+    const signupBtn = document.getElementById('signupBtn');
+
+    // دالة إظهار الخطأ
+    function showError(message) {
+      errorText.textContent = message;
+      errorDiv.classList.remove('hidden');
+      successDiv.classList.add('hidden');
+      
+      // إخفاء الخطأ بعد 5 ثواني
+      setTimeout(() => {
+        errorDiv.classList.add('hidden');
+      }, 5000);
+    }
+
+    // دالة إظهار النجاح
+    function showSuccess(message) {
+      successDiv.classList.remove('hidden');
+      errorDiv.classList.add('hidden');
+    }
+
+    // التحقق من صحة رقم الهاتف المصري
+    function isValidEgyptianPhone(phone) {
+      const phoneRegex = /^01[0-2,5]{1}[0-9]{8}$/;
+      return phoneRegex.test(phone);
+    }
+
+    // التعامل مع submit النموذج
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      console.log("🟢 تم الضغط على زر التسجيل");
+      
+      // التحقق من الموافقة على الشروط
+      if (!terms.checked) {
+        showError('يجب الموافقة على شروط الاستخدام');
+        return;
+      }
+      
+      // جمع البيانات
+      const userData = {
+        fullName: fullName.value.trim(),
+        email: email.value.trim(),
+        password: password.value,
+        grade: grade.value,
+        parentName: parentName.value.trim(),
+        parentPhone: parentPhone.value.trim(),
+        parentPhone2: parentPhone2.value.trim(),
+        createdAt: new Date().toISOString(),
+        type: 'student' // نوع المستخدم: طالب
+      };
+      
+      console.log("📋 البيانات:", userData);
+      
+      // التحقق من الحقول المطلوبة
+      if (!userData.fullName || !userData.email || !userData.password || !userData.grade || !userData.parentName || !userData.parentPhone) {
+        showError('من فضلك املأ جميع الحقول المطلوبة');
+        return;
+      }
+      
+      // التحقق من صحة البريد الإلكتروني
+      if (!userData.email.includes('@') || !userData.email.includes('.')) {
+        showError('البريد الإلكتروني غير صالح');
+        return;
+      }
+      
+      // التحقق من كلمة المرور
+      if (userData.password.length < 6) {
+        showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+        return;
+      }
+      
+      // التحقق من رقم الهاتف
+      if (!isValidEgyptianPhone(userData.parentPhone)) {
+        showError('رقم الهاتف غير صحيح. يجب أن يبدأ بـ 01 ويتكون من 11 رقم');
+        return;
+      }
+      
+      // التحقق من رقم الهاتف الثاني (إذا وجد)
+      if (userData.parentPhone2 && !isValidEgyptianPhone(userData.parentPhone2)) {
+        showError('رقم الهاتف الثاني غير صحيح');
+        return;
+      }
+      
+      // تفعيل حالة التحميل
+      signupBtn.disabled = true;
+      signupBtn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin ml-2"></i> جاري إنشاء الحساب...';
+      
+      try {
+        // إنشاء حساب في Firebase Auth
+        console.log("🔄 جاري إنشاء حساب في Auth...");
+        const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
+        
+        console.log("✅ تم إنشاء الحساب في Auth:", userCredential.user.uid);
+        
+        // تحديث الاسم في Auth
+        await updateProfile(userCredential.user, {
+          displayName: userData.fullName
+        });
+        
+        // حفظ البيانات في Firestore
+        console.log("🔄 جاري حفظ البيانات في Firestore...");
+        
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
+          fullName: userData.fullName,
+          email: userData.email,
+          grade: userData.grade,
+          parentName: userData.parentName,
+          parentPhone: userData.parentPhone,
+          parentPhone2: userData.parentPhone2 || '',
+          createdAt: userData.createdAt,
+          type: 'student',
+          uid: userCredential.user.uid
+        });
+        
+        console.log("✅ تم حفظ البيانات في Firestore");
+        
+        // عرض رسالة نجاح
+        showSuccess('تم إنشاء الحساب بنجاح! جاري التحويل...');
+        
+        // الانتقال إلى لوحة التحكم بعد ثانيتين
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 2000);
+        
+      } catch (error) {
+        console.error("❌ خطأ:", error.code, error.message);
+        
+        // رسائل خطأ مفهومة
+        let message = 'حدث خطأ في إنشاء الحساب';
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            message = 'البريد الإلكتروني مستخدم بالفعل';
+            break;
+          case 'auth/invalid-email':
+            message = 'البريد الإلكتروني غير صالح';
+            break;
+          case 'auth/weak-password':
+            message = 'كلمة المرور ضعيفة جداً';
+            break;
+          case 'permission-denied':
+            message = 'خطأ في الصلاحيات. تواصل مع الدعم الفني';
+            break;
+          default:
+            message = error.message;
+        }
+        
+        showError('❌ ' + message);
+        
+      } finally {
+        signupBtn.disabled = false;
+        signupBtn.innerHTML = 'إنشاء الحساب';
+      }
+      
+    });
+
+  </script>
+
+  <style>
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    /* تحسين مظهر الحقول */
+    input, select {
+      transition: all 0.3s ease;
+    }
+    
+    input:focus, select:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -5px rgba(67, 97, 238, 0.3);
+    }
+  </style>
+</body>
+</html>
